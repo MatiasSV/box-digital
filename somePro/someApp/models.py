@@ -164,7 +164,7 @@ class Box(models.Model):
         return self.nombre_box
     
 class Reserva(models.Model):
-    motivo_consulta = models.CharField(max_length=100)
+    folio = models.PositiveIntegerField(null=True, blank=True, help_text="Folio único que se mantiene en reprogramaciones")
     nombre_paciente = models.CharField(max_length=200)
     genero_paciente = models.CharField(max_length=50)
     edad_paciente = models.CharField(max_length=10)
@@ -185,8 +185,17 @@ class Reserva(models.Model):
     motivo_cancelacion = models.CharField(max_length=200, null=True, blank=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 
+    def save(self, *args, **kwargs):
+        if not self.folio:
+            max_folio = Reserva.objects.aggregate(models.Max('folio'))['folio__max']
+            if max_folio is not None and max_folio >= 10000:
+                self.folio = max_folio + 1
+            else:
+                self.folio = 10000
+        super().save(*args, **kwargs)
+
     def __str__(self):
-        return f"{self.nombre_paciente} - {self.motivo_consulta}"
+        return f"Folio {self.folio} - {self.nombre_paciente} - {self.motivo_consulta}"
 
 
 class Registro(models.Model):
