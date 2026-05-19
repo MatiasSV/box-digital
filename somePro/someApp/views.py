@@ -1,12 +1,12 @@
 from django.shortcuts import render
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
-from .models import RedHospitalaria, Establecimiento, Estamento, Funcionario, Box, Registro
+from .models import RedHospitalaria, Establecimiento, Estamento, Profesional, Box, Registro
 from .serializers import (
     RedHospitalariaSerializer,
     EstablecimientoSerializer,
     EstamentoSerializer,
-    FuncionarioSerializer,
+    ProfesionalSerializer,
     BoxSerializer,
     RegistroSerializer
 )
@@ -26,9 +26,9 @@ class EstamentoViewSet(viewsets.ModelViewSet):
     serializer_class = EstamentoSerializer
     permission_classes = [IsAuthenticated]
 
-class FuncionarioViewSet(viewsets.ModelViewSet):
-    queryset = Funcionario.objects.all()
-    serializer_class = FuncionarioSerializer
+class ProfesionalViewSet(viewsets.ModelViewSet):
+    queryset = Profesional.objects.all()
+    serializer_class = ProfesionalSerializer
     permission_classes = [IsAuthenticated]
 
 class BoxViewSet(viewsets.ModelViewSet):

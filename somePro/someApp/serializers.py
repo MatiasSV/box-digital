@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import RedHospitalaria, Establecimiento, Estamento, Funcionario, Box, Registro
+from .models import RedHospitalaria, Establecimiento, Estamento, Profesional, Box, Registro
 
 class RedHospitalariaSerializer(serializers.ModelSerializer):
     class Meta:
@@ -16,9 +16,9 @@ class EstamentoSerializer(serializers.ModelSerializer):
         model = Estamento
         fields = '__all__'
 
-class FuncionarioSerializer(serializers.ModelSerializer):
+class ProfesionalSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Funcionario
+        model = Profesional
         fields = '__all__'
 
 class BoxSerializer(serializers.ModelSerializer):

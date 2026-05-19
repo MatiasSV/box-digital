@@ -31,7 +31,7 @@ class Estamento(models.Model):
     def __str__(self):
         return self.nombre_estamento
 
-class Funcionario(models.Model):
+class Profesional(models.Model):
     nombres = models.CharField(max_length=200)
     apellido_paterno = models.CharField(max_length=100, null=True, blank=True)
     apellido_materno = models.CharField(max_length=100 , null=True, blank=True)
@@ -99,7 +99,7 @@ class Box(models.Model):
     registros_uso = models.DateTimeField(null=True, blank=True)
     fecha_ultimo_uso = models.DateTimeField(null=True, blank=True)
     establecimiento = models.ForeignKey(Establecimiento, on_delete=models.CASCADE, related_name='boxes')
-    funcionarios = models.ManyToManyField(Funcionario, related_name='boxes_asignados')
+    profesionales = models.ManyToManyField(Profesional, related_name='boxes_asignados')
 
     def __str__(self):
         return self.nombre_box
@@ -113,7 +113,7 @@ class Registro(models.Model):
     region = models.CharField(max_length=100)
     programa_salud = models.CharField(max_length=100)
     establecimiento = models.ForeignKey(Establecimiento, on_delete=models.CASCADE, related_name='registros')
-    funcionario = models.ForeignKey(Funcionario, on_delete=models.CASCADE, related_name='registros_atendidos')
+    profesional = models.ForeignKey(Profesional, on_delete=models.CASCADE, related_name='registros_atendidos')
 
     def __str__(self):
         return f"{self.nombre_paciente} - {self.motivo_consulta}"
