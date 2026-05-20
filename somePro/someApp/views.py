@@ -2,7 +2,9 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.views import TokenObtainPairView
 from .models import RedHospitalaria, Establecimiento, Estamento, Profesional, Box, Registro, FuncionarioSome, Reserva
+from .permissions import IsFuncionarioSome, IsProfesional, is_profesional, is_funcionario
 from .serializers import (
     RedHospitalariaSerializer,
     EstablecimientoSerializer,
@@ -11,8 +13,12 @@ from .serializers import (
     BoxSerializer,
     RegistroSerializer,
     FuncionarioSomeSerializer,
-    ReservaSerializer
+    ReservaSerializer,
+    CustomTokenObtainPairSerializer
 )
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
 
 class RedHospitalariaViewSet(viewsets.ModelViewSet):
     queryset = RedHospitalaria.objects.all()
@@ -42,7 +48,12 @@ class BoxViewSet(viewsets.ModelViewSet):
 class RegistroViewSet(viewsets.ModelViewSet):
     queryset = Registro.objects.all()
     serializer_class = RegistroSerializer
-    permission_classes = [IsAuthenticated]
+    
+    def get_permissions(self):
+        if self.action == 'create':
+            # Solo el profesional de la salud puede crear registros
+            return [IsAuthenticated(), IsProfesional()]
+        return [IsAuthenticated()]
 
 class FuncionarioSomeViewSet(viewsets.ModelViewSet):
     queryset = FuncionarioSome.objects.all()
@@ -52,7 +63,27 @@ class FuncionarioSomeViewSet(viewsets.ModelViewSet):
 class ReservaViewSet(viewsets.ModelViewSet):
     queryset = Reserva.objects.all()
     serializer_class = ReservaSerializer
-    permission_classes = [IsAuthenticated]
+    
+    def get_permissions(self):
+        if self.action == 'create':
+            # Solo funcionario SOME puede crear reservas
+            return [IsAuthenticated(), IsFuncionarioSome()]
+        # El resto (listar, ver, actualizar) requieren estar autenticado
+        return [IsAuthenticated()]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        user = self.request.user
+        
+        # Si es un profesional de la salud, solo puede ver sus propias reservas asignadas
+        if is_profesional(user) and not user.is_superuser:
+            try:
+                profesional = Profesional.objects.get(email=user.email)
+                qs = qs.filter(profesional=profesional)
+            except Profesional.DoesNotExist:
+                return qs.none()
+                
+        return qs
 
 def get_establecimientos(request):
     red_id = request.GET.get('red_id')
