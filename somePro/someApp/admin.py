@@ -1,10 +1,13 @@
-from django.contrib import admin
-from .models import RedHospitalaria, Establecimiento, Estamento, Profesional, Box, Registro, FuncionarioSome, Reserva
+﻿from django.contrib import admin
+from .models import RedHospitalaria, Establecimiento, Estamento, Profesional, Box, Registro, FuncionarioSome, Reserva, Genero, CargoSome, CargoProfesional
 
-# Register your models here.
+admin.site.register(CargoSome)
+admin.site.register(CargoProfesional)
+admin.site.register(Genero)
 admin.site.register(RedHospitalaria)
 admin.site.register(Establecimiento)
 admin.site.register(Estamento)
+
 @admin.register(Profesional)
 class ProfesionalAdmin(admin.ModelAdmin):
     readonly_fields = ("edad",)
